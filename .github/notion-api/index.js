@@ -53,7 +53,7 @@ function extractFileNameFromPath(filePath) {
 }
 
 function getTargetPage(pages, problemName) {
-  return pages.find(page => page.properties.번호.rich_text[0].plain_text === problemName);
+  return pages.find(page => page?.properties?.번호?.rich_text[0]?.plain_text === problemName);
 }
 
 function isEmptyTargetPage(targetPage) {
