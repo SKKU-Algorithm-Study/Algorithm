@@ -1,0 +1,50 @@
+name: Run Node.js Application
+
+on:
+  push:
+    branches:
+      - 이진선
+      - 황규현
+      - 김은호
+      - 최영광
+      - 서영훈
+
+jobs:
+  run-node:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get new files
+        id: get_new_files
+        run: |
+          # Get the hash of the previous commit
+          PREVIOUS_COMMIT=$(git rev-parse HEAD^)
+          
+          # Get the list of newly added files
+          NEW_FILES=$(git diff --name-status $PREVIOUS_COMMIT HEAD | grep '^A' | awk '{print $2}' | tr '\n' ',')
+          
+          # Check if any new files were found
+          if [ -z "$NEW_FILES" ]; then
+            echo "NEW_FILES=" >> $GITHUB_ENV
+          else
+            echo "NEW_FILES=${NEW_FILES}" >> $GITHUB_ENV
+          fi      
+
+      - name: Set branch name
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Run application
+        run: node ./.github/notion-api/index.js
+        env:
+          USER_NAME: ${{ env.BRANCH_NAME }}
+          FILE_NAME: ${{ env.NEW_FILES }}
